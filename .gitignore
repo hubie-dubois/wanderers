@@ -27,5 +27,6 @@ pnpm-debug.log*
 HARDENING_STEPS.md
 supabase_harden_visitors.sql
 MONITORING.md
+LOCAL_ADMIN_CLEANUP_GUIDE.md
 scripts/
 supabase/functions/
