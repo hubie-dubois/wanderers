@@ -1,0 +1,28 @@
+# macOS
+.DS_Store
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Supabase local artifacts
+supabase/.temp/
+supabase/.branches/
+
+# Common dependency / build dirs
+node_modules/
+dist/
+build/
+coverage/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Local-only project notes/migrations
+HARDENING_STEPS.md
+supabase_harden_visitors.sql

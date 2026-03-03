@@ -1,0 +1,1748 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>You Found Us · A Cosmic Guest Book · hubiedubois.com</title>
+    <meta name="description" content="You stumbled across a hidden corner of the internet. Sign the cosmic guest book and let the world know you were here.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* ============================================
+           CSS VARIABLES & RESET
+        ============================================ */
+        :root {
+            --void: #03040e;
+            --deep-space: #060a18;
+            --nebula: #0c1330;
+            --gold: #d4af37;
+            --gold-dim: #a8892a;
+            --gold-bright: #f2d060;
+            --gold-glow: rgba(212,175,55,0.12);
+            --gold-glow-strong: rgba(212,175,55,0.3);
+            --silver: #c8d0e0;
+            --silver-dim: #6e7a94;
+            --white: #f0eee8;
+            --aurora-purple: rgba(90,40,180,0.11);
+            --aurora-blue: rgba(25,90,190,0.09);
+            --aurora-rose: rgba(180,45,110,0.07);
+            --card-bg: rgba(10,18,50,0.65);
+            --card-border: rgba(212,175,55,0.18);
+            --input-bg: rgba(3,4,14,0.85);
+            --row-hover: rgba(212,175,55,0.05);
+            --radius: 14px;
+            --radius-sm: 7px;
+            --shadow-gold: 0 0 40px rgba(212,175,55,0.15), 0 0 80px rgba(212,175,55,0.05);
+        }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+        background: var(--void);
+        color: var(--white);
+        font-family: 'Raleway', sans-serif;
+        font-weight: 300;
+        overflow-x: hidden;
+        min-height: 100vh;
+        line-height: 1.7;
+    }
+
+    /* ============================================
+       STARFIELD CANVAS
+    ============================================ */
+    #starfield {
+        position: fixed; top: 0; left: 0;
+        width: 100%; height: 100%;
+        z-index: 0; pointer-events: none;
+    }
+
+    /* ============================================
+       AURORA BACKGROUNDS
+    ============================================ */
+    .aurora-layer {
+        position: fixed; top: 0; left: 0;
+        width: 100%; height: 100%;
+        z-index: 0; pointer-events: none; overflow: hidden;
+    }
+
+    .aurora-blob {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(90px);
+    }
+
+    .aurora-blob-1 {
+        width: 65vw; height: 65vw;
+        background: radial-gradient(circle, var(--aurora-purple), transparent 70%);
+        top: -20%; right: -15%;
+        animation: blob-drift 22s ease-in-out infinite alternate;
+    }
+
+    .aurora-blob-2 {
+        width: 55vw; height: 55vw;
+        background: radial-gradient(circle, var(--aurora-blue), transparent 70%);
+        bottom: 5%; left: -15%;
+        animation: blob-drift 28s ease-in-out infinite alternate-reverse;
+    }
+
+    .aurora-blob-3 {
+        width: 40vw; height: 40vw;
+        background: radial-gradient(circle, var(--aurora-rose), transparent 70%);
+        top: 35%; left: 25%;
+        animation: blob-drift 35s ease-in-out infinite;
+    }
+
+    @keyframes blob-drift {
+        0%   { transform: translate(0,0) scale(1); }
+        33%  { transform: translate(3%,6%) scale(1.06); }
+        66%  { transform: translate(-3%,2%) scale(0.94); }
+        100% { transform: translate(5%,-4%) scale(1.1); }
+    }
+
+    /* ============================================
+       LAYOUT
+    ============================================ */
+    .container {
+        position: relative; z-index: 1;
+        max-width: 1220px; margin: 0 auto; padding: 0 28px;
+    }
+
+    /* ============================================
+       HEADER
+    ============================================ */
+    header {
+        position: sticky; top: 0; z-index: 100;
+        padding: 18px 0;
+        border-bottom: 1px solid rgba(212,175,55,0.08);
+        background: rgba(3,4,14,0.7);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+    }
+
+    .header-inner {
+        display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    }
+
+    .logo {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.05rem; font-weight: 700;
+        color: var(--gold); letter-spacing: 0.12em;
+        text-decoration: none;
+    }
+
+    .logo em {
+        color: var(--silver-dim); font-style: italic; font-weight: 400; font-size: 0.9em;
+    }
+
+    .header-right {
+        display: flex; align-items: center; gap: 24px;
+    }
+
+    .header-clock {
+        font-family: 'Space Mono', monospace;
+        font-size: 0.65rem; color: var(--silver-dim);
+        text-align: right; line-height: 1.7;
+    }
+
+    .header-clock .time-line {
+        color: var(--silver); font-weight: 700;
+    }
+
+    .header-nav {
+        display: flex; gap: 8px;
+    }
+
+    .nav-btn {
+        background: transparent;
+        border: 1px solid rgba(212,175,55,0.25);
+        border-radius: 100px;
+        color: var(--silver-dim);
+        font-family: 'Space Mono', monospace;
+        font-size: 0.6rem; letter-spacing: 0.1em;
+        padding: 7px 16px; cursor: pointer;
+        text-transform: uppercase;
+        transition: all 0.25s;
+        text-decoration: none; display: inline-block;
+    }
+
+    .nav-btn:hover {
+        border-color: var(--gold); color: var(--gold);
+        background: var(--gold-glow);
+    }
+
+    /* ============================================
+       HERO
+    ============================================ */
+    .hero {
+        padding: 110px 0 90px;
+        text-align: center;
+        position: relative;
+    }
+
+    .hero-badge {
+        display: inline-flex; align-items: center; gap: 10px;
+        border: 1px solid rgba(212,175,55,0.2);
+        border-radius: 100px;
+        padding: 8px 20px;
+        font-family: 'Space Mono', monospace;
+        font-size: 0.62rem; letter-spacing: 0.3em;
+        color: var(--gold); text-transform: uppercase;
+        margin-bottom: 36px;
+        background: rgba(212,175,55,0.05);
+        opacity: 0;
+        animation: fade-up 1s ease forwards 0.2s;
+    }
+
+    .badge-dot {
+        width: 6px; height: 6px; border-radius: 50%;
+        background: var(--gold);
+        animation: pulse-dot 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse-dot {
+        0%,100% { box-shadow: 0 0 0 0 rgba(212,175,55,0.6); }
+        50% { box-shadow: 0 0 0 5px rgba(212,175,55,0); }
+    }
+
+    .hero-title {
+        font-family: 'Playfair Display', serif;
+        font-size: clamp(3rem, 7.5vw, 6rem);
+        font-weight: 900;
+        line-height: 1.02;
+        color: var(--white);
+        margin-bottom: 6px;
+        opacity: 0;
+        animation: fade-up 1s ease forwards 0.45s;
+    }
+
+    .hero-title .accent { color: var(--gold); font-style: italic; }
+
+    .hero-title-2 {
+        font-family: 'Playfair Display', serif;
+        font-size: clamp(1.5rem, 3vw, 2.4rem);
+        font-weight: 400; font-style: italic;
+        color: var(--silver-dim);
+        margin-bottom: 40px;
+        opacity: 0;
+        animation: fade-up 1s ease forwards 0.65s;
+    }
+
+    .hero-body {
+        font-size: 1.05rem;
+        color: var(--silver); max-width: 560px;
+        margin: 0 auto 52px; line-height: 1.85;
+        opacity: 0;
+        animation: fade-up 1s ease forwards 0.85s;
+    }
+
+    .hero-cta {
+        display: inline-flex; align-items: center; gap: 10px;
+        background: linear-gradient(135deg, var(--gold-dim), var(--gold), var(--gold-bright));
+        border: none; border-radius: var(--radius-sm);
+        color: #1a0e00;
+        font-family: 'Space Mono', monospace;
+        font-size: 0.75rem; font-weight: 700;
+        letter-spacing: 0.15em; text-transform: uppercase;
+        padding: 16px 32px; cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        opacity: 0;
+        animation: fade-up 1s ease forwards 1.05s;
+        position: relative; overflow: hidden;
+    }
+
+    .hero-cta::before {
+        content: '';
+        position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+        transition: left 0.5s ease;
+    }
+
+    .hero-cta:hover::before { left: 100%; }
+    .hero-cta:hover { transform: translateY(-2px); box-shadow: 0 10px 40px rgba(212,175,55,0.45); }
+
+    .hero-scroll-hint {
+        margin-top: 60px;
+        display: flex; flex-direction: column; align-items: center; gap: 8px;
+        opacity: 0; animation: fade-in 1s ease forwards 1.4s;
+    }
+
+    .hero-scroll-hint span {
+        font-family: 'Space Mono', monospace;
+        font-size: 0.58rem; letter-spacing: 0.25em;
+        color: var(--silver-dim); text-transform: uppercase;
+    }
+
+    .scroll-line {
+        width: 1px; height: 40px;
+        background: linear-gradient(to bottom, var(--gold), transparent);
+        animation: scroll-pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes scroll-pulse {
+        0%,100% { opacity: 0.3; transform: scaleY(1); }
+        50% { opacity: 1; transform: scaleY(1.1); }
+    }
+
+    @keyframes fade-up {
+        0% { opacity: 0; transform: translateY(22px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fade-in {
+        0% { opacity: 0; }
+        100% { opacity: 1; }
+    }
+
+    /* ============================================
+       SECTION PRIMITIVES
+    ============================================ */
+    .section-eyebrow {
+        display: flex; align-items: center;
+        gap: 14px; margin-bottom: 14px;
+        font-family: 'Space Mono', monospace;
+        font-size: 0.62rem; letter-spacing: 0.35em;
+        color: var(--gold); text-transform: uppercase;
+    }
+
+    .section-eyebrow::before, .section-eyebrow::after {
+        content: ''; flex: 1; height: 1px;
+    }
+
+    .section-eyebrow::before { background: linear-gradient(to right, transparent, var(--gold-dim)); }
+    .section-eyebrow::after  { background: linear-gradient(to left, transparent, var(--gold-dim)); }
+
+    .section-heading {
+        font-family: 'Playfair Display', serif;
+        font-size: clamp(1.7rem, 3vw, 2.6rem);
+        font-weight: 700; text-align: center;
+        color: var(--white); margin-bottom: 8px;
+    }
+
+    .section-sub {
+        text-align: center; color: var(--silver-dim);
+        font-size: 0.9rem; margin-bottom: 52px;
+    }
+
+    /* ============================================
+       FORM SECTION
+    ============================================ */
+    .form-section { padding: 0 0 90px; }
+
+    .form-card {
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: var(--radius);
+        padding: 52px 52px 44px;
+        max-width: 660px; margin: 0 auto;
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        box-shadow: var(--shadow-gold), inset 0 1px 0 rgba(255,255,255,0.04);
+        position: relative; overflow: hidden;
+    }
+
+    .form-card::before {
+        content: '';
+        position: absolute; top: 0; left: 0; right: 0; height: 2px;
+        background: linear-gradient(90deg, transparent 0%, var(--gold-dim) 20%, var(--gold-bright) 50%, var(--gold-dim) 80%, transparent 100%);
+    }
+
+    .form-ornament {
+        position: absolute; right: 28px; top: 28px;
+        font-family: 'Playfair Display', serif;
+        font-size: 90px; color: rgba(212,175,55,0.04);
+        line-height: 1; pointer-events: none; user-select: none;
+    }
+
+    .form-grid {
+        display: grid; grid-template-columns: 1fr 1fr;
+        gap: 20px; margin-bottom: 20px;
+    }
+
+    .form-group { display: flex; flex-direction: column; gap: 9px; }
+    .form-group.full { grid-column: 1 / -1; }
+
+    label {
+        font-family: 'Space Mono', monospace;
+        font-size: 0.62rem; letter-spacing: 0.2em;
+        text-transform: uppercase; color: var(--gold-dim);
+    }
+
+    input[type=text], textarea {
+        background: var(--input-bg);
+        border: 1px solid rgba(212,175,55,0.15);
+        border-radius: var(--radius-sm);
+        color: var(--white);
+        font-family: 'Raleway', sans-serif;
+        font-size: 0.95rem; font-weight: 400;
+        padding: 14px 16px;
+        transition: all 0.3s ease;
+        outline: none; width: 100%;
+    }
+
+    input[type=text]::placeholder, textarea::placeholder {
+        color: var(--silver-dim); opacity: 0.45;
+    }
+
+    input[type=text]:focus, textarea:focus {
+        border-color: var(--gold);
+        background: rgba(3,4,14,0.95);
+        box-shadow: 0 0 0 3px rgba(212,175,55,0.09);
+    }
+
+    textarea { resize: vertical; min-height: 96px; }
+
+    .char-count {
+        font-family: 'Space Mono', monospace;
+        font-size: 0.6rem; color: var(--silver-dim);
+        text-align: right; margin-top: -2px;
+    }
+
+    .captcha-wrap {
+        margin-top: 6px;
+        margin-bottom: 14px;
+        min-height: 66px;
+    }
+
+    .submit-btn {
+        width: 100%; padding: 17px 32px;
+        background: linear-gradient(135deg, var(--gold-dim) 0%, var(--gold) 50%, var(--gold-bright) 100%);
+        border: none; border-radius: var(--radius-sm);
+        color: #15100a;
+        font-family: 'Space Mono', monospace;
+        font-size: 0.75rem; font-weight: 700;
+        letter-spacing: 0.18em; text-transform: uppercase;
+        cursor: pointer; transition: all 0.3s ease;
+        position: relative; overflow: hidden;
+        margin-top: 10px;
+    }
+
+    .submit-btn::after {
+        content: '';
+        position: absolute; top: 0; left: -100%;
+        width: 100%; height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.22), transparent);
+        transition: left 0.55s ease;
+    }
+
+    .submit-btn:hover::after { left: 100%; }
+    .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 35px rgba(212,175,55,0.42); }
+    .submit-btn:active { transform: translateY(0); }
+    .submit-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+    .form-success {
+        display: none; text-align: center; padding: 20px 0;
+    }
+
+    .form-success.show {
+        display: block;
+        animation: fade-up 0.5s ease forwards;
+    }
+
+    .success-icon {
+        font-size: 3.5rem; display: block;
+        margin-bottom: 18px;
+        animation: burst 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards;
+    }
+
+    @keyframes burst {
+        0% { transform: scale(0) rotate(-180deg); }
+        70% { transform: scale(1.25) rotate(10deg); }
+        100% { transform: scale(1) rotate(0); }
+    }
+
+    .form-success h3 {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.6rem; color: var(--gold);
+        margin-bottom: 10px;
+    }
+
+    .form-success p { color: var(--silver-dim); font-size: 0.95rem; }
+
+    .form-error {
+        background: rgba(220,50,50,0.08);
+        border: 1px solid rgba(220,50,50,0.25);
+        border-radius: var(--radius-sm);
+        color: #ff9999; font-size: 0.85rem;
+        padding: 12px 16px; margin-top: 14px;
+        display: none;
+    }
+
+    .form-error.show { display: block; }
+
+    .reset-btn {
+        display: inline-block; margin-top: 22px;
+        padding: 12px 28px;
+        background: transparent;
+        border: 1px solid rgba(212,175,55,0.3);
+        border-radius: var(--radius-sm);
+        color: var(--gold);
+        font-family: 'Space Mono', monospace;
+        font-size: 0.65rem; letter-spacing: 0.15em;
+        text-transform: uppercase; cursor: pointer;
+        transition: all 0.25s;
+    }
+
+    .reset-btn:hover { background: var(--gold-glow); border-color: var(--gold); }
+
+    /* ============================================
+       STATS SECTION
+    ============================================ */
+    .stats-section { padding: 0 0 90px; }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+        gap: 16px; margin-top: 52px;
+    }
+
+    .stat-card {
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: var(--radius);
+        padding: 30px 22px;
+        text-align: center;
+        backdrop-filter: blur(14px);
+        transition: all 0.3s ease;
+        position: relative; overflow: hidden;
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute; top: 0; left: 0; right: 0; height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(212,175,55,0.4), transparent);
+    }
+
+    .stat-card:hover {
+        border-color: rgba(212,175,55,0.4);
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-gold);
+    }
+
+    .stat-icon { font-size: 1.9rem; display: block; margin-bottom: 13px; }
+
+    .stat-value {
+        font-family: 'Playfair Display', serif;
+        font-size: 2.1rem; font-weight: 700;
+        color: var(--gold); line-height: 1; margin-bottom: 7px;
+    }
+
+    .stat-value.sm { font-size: 1.15rem; }
+
+    .stat-label {
+        font-family: 'Space Mono', monospace;
+        font-size: 0.58rem; letter-spacing: 0.15em;
+        text-transform: uppercase; color: var(--silver-dim);
+    }
+
+    /* ============================================
+       QUERY SECTION
+    ============================================ */
+    .queries-section { padding: 0 0 36px; }
+
+    .query-pills {
+        display: flex; flex-wrap: wrap; gap: 10px;
+        margin-top: 36px; justify-content: center;
+    }
+
+    .query-pill {
+        background: transparent;
+        border: 1px solid rgba(212,175,55,0.22);
+        border-radius: 100px;
+        color: var(--silver-dim);
+        font-family: 'Space Mono', monospace;
+        font-size: 0.62rem; letter-spacing: 0.1em;
+        padding: 10px 20px; cursor: pointer;
+        transition: all 0.25s; text-transform: uppercase;
+    }
+
+    .query-pill:hover { border-color: rgba(212,175,55,0.55); color: var(--silver); }
+
+    .query-pill.active {
+        background: var(--gold-glow);
+        border-color: var(--gold); color: var(--gold);
+        box-shadow: 0 0 18px rgba(212,175,55,0.12);
+    }
+
+    /* ============================================
+       TABLE SECTION
+    ============================================ */
+    .table-section { padding: 0 0 110px; }
+
+    .table-controls {
+        display: flex; gap: 12px; align-items: center;
+        flex-wrap: wrap; margin-bottom: 20px;
+    }
+
+    .search-wrap {
+        position: relative; flex: 1; min-width: 200px;
+    }
+
+    .search-icon {
+        position: absolute; left: 14px; top: 50%;
+        transform: translateY(-50%); font-size: 0.85rem;
+        pointer-events: none; opacity: 0.5;
+    }
+
+    .search-input { padding-left: 40px !important; }
+
+    .filter-select {
+        background: var(--input-bg);
+        border: 1px solid rgba(212,175,55,0.15);
+        border-radius: var(--radius-sm);
+        color: var(--white);
+        font-family: 'Raleway', sans-serif;
+        font-size: 0.9rem; padding: 14px 16px;
+        outline: none; cursor: pointer;
+        min-width: 165px; transition: border-color 0.25s;
+    }
+
+    .filter-select:focus { border-color: var(--gold); }
+    .filter-select option { background: #060a18; }
+
+    .ctrl-btn {
+        background: transparent;
+        border: 1px solid rgba(212,175,55,0.18);
+        border-radius: var(--radius-sm);
+        color: var(--silver-dim);
+        font-family: 'Space Mono', monospace;
+        font-size: 0.6rem; letter-spacing: 0.1em;
+        padding: 14px 16px; cursor: pointer;
+        transition: all 0.2s; text-transform: uppercase;
+        white-space: nowrap;
+    }
+
+    .ctrl-btn:hover, .ctrl-btn.active {
+        border-color: var(--gold); color: var(--gold);
+    }
+
+    .table-meta {
+        display: flex; justify-content: space-between;
+        align-items: center; margin-bottom: 14px;
+        flex-wrap: wrap; gap: 8px;
+    }
+
+    .table-count {
+        font-family: 'Space Mono', monospace;
+        font-size: 0.68rem; color: var(--silver-dim);
+    }
+
+    .table-count span { color: var(--gold); }
+
+    .table-wrapper {
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: var(--radius);
+        overflow: hidden;
+        backdrop-filter: blur(14px);
+        box-shadow: 0 4px 50px rgba(0,0,0,0.4);
+    }
+
+    .table-scroll { overflow-x: auto; }
+
+    .data-table {
+        width: 100%; border-collapse: collapse;
+        min-width: 620px;
+    }
+
+    .data-table thead {
+        background: rgba(212,175,55,0.04);
+        border-bottom: 1px solid rgba(212,175,55,0.14);
+    }
+
+    .data-table th {
+        font-family: 'Space Mono', monospace;
+        font-size: 0.58rem; letter-spacing: 0.2em;
+        text-transform: uppercase; color: var(--gold-dim);
+        padding: 16px 20px; text-align: left;
+        user-select: none;
+        white-space: nowrap; transition: color 0.2s;
+    }
+
+    .th-sort-btn {
+        background: transparent;
+        border: 0;
+        color: inherit;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        font: inherit;
+        letter-spacing: inherit;
+        padding: 0;
+        text-transform: inherit;
+    }
+
+    .th-sort-btn:hover,
+    .th-sort-btn:focus-visible {
+        color: var(--gold);
+        outline: none;
+    }
+
+    .th-sort-btn .si {
+        margin-left: 5px; opacity: 0.35; font-size: 0.8em;
+    }
+
+    .th-sort-btn.active .si { opacity: 1; color: var(--gold); }
+
+    .data-table tbody tr {
+        border-bottom: 1px solid rgba(255,255,255,0.035);
+        transition: background 0.2s;
+    }
+
+    .data-table tbody tr:last-child { border-bottom: none; }
+    .data-table tbody tr:hover { background: var(--row-hover); }
+
+    .data-table td {
+        padding: 15px 20px; font-size: 0.9rem;
+        color: var(--silver); vertical-align: middle;
+    }
+
+    td.tc-num {
+        font-family: 'Space Mono', monospace;
+        font-size: 0.62rem; color: rgba(255,255,255,0.18);
+        width: 50px;
+    }
+
+    td.tc-city { font-weight: 500; color: var(--white); }
+
+    td.tc-country { color: var(--gold-dim); white-space: nowrap; }
+
+    .flag { font-size: 1.15rem; margin-right: 7px; }
+
+    td.tc-msg {
+        font-style: italic; color: var(--silver-dim);
+        font-size: 0.85rem; max-width: 240px;
+        overflow: hidden; text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    td.tc-msg.empty { opacity: 0.25; }
+
+    td.tc-time {
+        font-family: 'Space Mono', monospace;
+        font-size: 0.65rem; color: var(--silver-dim);
+        white-space: nowrap;
+    }
+
+    .empty-state {
+        text-align: center; padding: 80px 20px;
+    }
+
+    .empty-icon { font-size: 3rem; display: block; margin-bottom: 16px; opacity: 0.35; }
+    .empty-state p { color: var(--silver-dim); font-style: italic; font-size: 0.95rem; }
+
+    /* Loading */
+    .loader {
+        display: inline-block; width: 22px; height: 22px;
+        border: 2px solid rgba(212,175,55,0.15);
+        border-top-color: var(--gold);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    tr.loading-row td { text-align: center; padding: 70px; }
+
+    /* ============================================
+       PAGINATION
+    ============================================ */
+    .pagination {
+        display: flex; align-items: center;
+        justify-content: center; gap: 7px;
+        padding: 22px 20px;
+        border-top: 1px solid rgba(255,255,255,0.035);
+        flex-wrap: wrap;
+    }
+
+    .page-btn {
+        background: transparent;
+        border: 1px solid rgba(212,175,55,0.18);
+        border-radius: var(--radius-sm);
+        color: var(--silver-dim);
+        font-family: 'Space Mono', monospace;
+        font-size: 0.65rem; padding: 8px 13px;
+        cursor: pointer; transition: all 0.2s;
+    }
+
+    .page-btn:hover:not(:disabled), .page-btn.active {
+        border-color: var(--gold); color: var(--gold);
+        background: var(--gold-glow);
+    }
+
+    .page-btn:disabled { opacity: 0.25; cursor: not-allowed; }
+    .page-ellipsis { color: var(--silver-dim); font-size: 0.7rem; padding: 0 4px; }
+
+    /* ============================================
+       NOTIFICATION TOAST
+    ============================================ */
+    .toast {
+        position: fixed; top: 24px; right: 24px;
+        background: rgba(10,18,50,0.95);
+        border: 1px solid var(--card-border);
+        border-radius: var(--radius);
+        padding: 14px 22px;
+        font-size: 0.85rem; color: var(--silver);
+        backdrop-filter: blur(20px);
+        box-shadow: var(--shadow-gold);
+        z-index: 9999; max-width: 320px;
+        transform: translateX(130%);
+        transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+    }
+
+    .toast.show { transform: translateX(0); }
+    .toast.success { border-color: rgba(80,200,120,0.35); }
+
+    /* ============================================
+       FOOTER
+    ============================================ */
+    footer {
+        border-top: 1px solid rgba(212,175,55,0.09);
+        padding: 48px 0;
+        text-align: center;
+    }
+
+    .footer-stars {
+        color: var(--gold); opacity: 0.25;
+        font-size: 0.65rem; letter-spacing: 0.7em;
+        margin-bottom: 16px;
+    }
+
+    .footer-text {
+        font-family: 'Space Mono', monospace;
+        font-size: 0.62rem; color: var(--silver-dim);
+        line-height: 2; letter-spacing: 0.08em;
+    }
+
+    .footer-text a { color: var(--gold-dim); text-decoration: none; }
+    .footer-text a:hover { color: var(--gold); }
+    .footer-visitor-num { color: var(--gold); font-weight: 700; }
+
+    .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+    }
+
+    /* ============================================
+       RESPONSIVE
+    ============================================ */
+    @media (max-width: 768px) {
+        .form-grid { grid-template-columns: 1fr; }
+        .form-card { padding: 32px 24px; }
+        .hero { padding: 70px 0 60px; }
+        .header-clock { display: none; }
+        .table-controls { flex-direction: column; align-items: stretch; }
+        .search-wrap, .filter-select { width: 100%; }
+        .ctrl-btn { width: 100%; text-align: center; }
+    }
+</style>
+
+</head>
+<body>
+
+<!-- Background -->
+
+<canvas id="starfield"></canvas>
+
+<div class="aurora-layer">
+    <div class="aurora-blob aurora-blob-1"></div>
+    <div class="aurora-blob aurora-blob-2"></div>
+    <div class="aurora-blob aurora-blob-3"></div>
+</div>
+
+<!-- Toast notification -->
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<!-- ============================================================
+     HEADER
+============================================================ -->
+
+<header>
+    <div class="container">
+        <div class="header-inner">
+            <a class="logo" href="#">hubiedubois<em>.com</em></a>
+            <div class="header-right">
+                <div class="header-clock">
+                    <div class="time-line" id="utc-clock">00:00:00</div>
+                    <div>UTC · EARTH · MILKY WAY</div>
+                </div>
+                <nav class="header-nav">
+                    <a class="nav-btn" href="#sign-book">Sign In</a>
+                    <a class="nav-btn" href="#guestbook">The Book</a>
+                </nav>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main>
+    <div class="container">
+
+    <!-- ================================================
+         HERO
+    ================================================ -->
+    <section class="hero">
+        <div class="hero-badge">
+            <span class="badge-dot"></span>
+            Cosmic Guest Book · Open to All Visitors
+        </div>
+        <h1 class="hero-title">
+            You Found a<br><span class="accent">Hidden Corner</span>
+        </h1>
+        <p class="hero-title-2">of the entire internet.</p>
+        <p class="hero-body">
+            No algorithm sent you. No advertisement guided your path.
+            Out of billions of pages on the web, you stumbled upon this one.
+            Take a moment — sign the guest book and let the world know you were here.
+        </p>
+        <a class="hero-cta" href="#sign-book">✦ &nbsp; Sign the Guest Book</a>
+        <div class="hero-scroll-hint">
+            <span>Scroll to explore</span>
+            <div class="scroll-line"></div>
+        </div>
+    </section>
+
+    <!-- ================================================
+         FORM SECTION
+    ================================================ -->
+    <section class="form-section" id="sign-book">
+        <div class="section-eyebrow">Sign the Cosmic Guest Book</div>
+        <h2 class="section-heading">Where in the World Are You?</h2>
+        <p class="section-sub">Takes 10 seconds. Lasts forever.</p>
+
+        <div class="form-card">
+            <div class="form-ornament">✦</div>
+
+            <div id="form-body">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="inp-city">Your City *</label>
+                        <input type="text" id="inp-city" placeholder="e.g. Tokyo" maxlength="100" autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label for="inp-country">Your Country *</label>
+                        <input type="text" id="inp-country" placeholder="e.g. Japan" maxlength="100"
+                               list="country-suggestions" autocomplete="off">
+                        <datalist id="country-suggestions">
+                            <option value="Afghanistan"><option value="Albania"><option value="Algeria">
+                            <option value="Argentina"><option value="Australia"><option value="Austria">
+                            <option value="Bangladesh"><option value="Belgium"><option value="Bolivia">
+                            <option value="Brazil"><option value="Cambodia"><option value="Canada">
+                            <option value="Chile"><option value="China"><option value="Colombia">
+                            <option value="Croatia"><option value="Cuba"><option value="Czech Republic">
+                            <option value="Denmark"><option value="Ecuador"><option value="Egypt">
+                            <option value="Ethiopia"><option value="Finland"><option value="France">
+                            <option value="Germany"><option value="Ghana"><option value="Greece">
+                            <option value="Guatemala"><option value="Haiti"><option value="Honduras">
+                            <option value="Hungary"><option value="India"><option value="Indonesia">
+                            <option value="Iran"><option value="Iraq"><option value="Ireland">
+                            <option value="Israel"><option value="Italy"><option value="Jamaica">
+                            <option value="Japan"><option value="Jordan"><option value="Kenya">
+                            <option value="Kuwait"><option value="Lebanon"><option value="Libya">
+                            <option value="Malaysia"><option value="Mexico"><option value="Morocco">
+                            <option value="Myanmar"><option value="Nepal"><option value="Netherlands">
+                            <option value="New Zealand"><option value="Nicaragua"><option value="Nigeria">
+                            <option value="Norway"><option value="Pakistan"><option value="Panama">
+                            <option value="Paraguay"><option value="Peru"><option value="Philippines">
+                            <option value="Poland"><option value="Portugal"><option value="Romania">
+                            <option value="Russia"><option value="Saudi Arabia"><option value="Senegal">
+                            <option value="Serbia"><option value="Singapore"><option value="Somalia">
+                            <option value="South Africa"><option value="South Korea"><option value="Spain">
+                            <option value="Sri Lanka"><option value="Sudan"><option value="Sweden">
+                            <option value="Switzerland"><option value="Syria"><option value="Taiwan">
+                            <option value="Tanzania"><option value="Thailand"><option value="Tunisia">
+                            <option value="Turkey"><option value="Uganda"><option value="Ukraine">
+                            <option value="United Arab Emirates"><option value="United Kingdom">
+                            <option value="United States"><option value="Uruguay"><option value="Venezuela">
+                            <option value="Vietnam"><option value="Yemen"><option value="Zambia">
+                            <option value="Zimbabwe">
+                        </datalist>
+                    </div>
+                    <div class="form-group full">
+                        <label for="inp-msg">Leave a Message <span style="opacity:.45">(optional · 280 chars)</span></label>
+                        <textarea id="inp-msg" placeholder="Say hello, share something, or just wave at the universe 👋" maxlength="280" oninput="updateCharCount()"></textarea>
+                        <div class="char-count"><span id="char-count">0</span> / 280</div>
+                    </div>
+                </div>
+                <div class="captcha-wrap">
+                    <div id="turnstile-widget"></div>
+                </div>
+                <button type="button" class="submit-btn" id="submit-btn" onclick="submitVisitor()">
+                    ✦ &nbsp; Mark My Spot in the Universe
+                </button>
+                <div class="form-error" id="form-error" role="alert" aria-live="polite"></div>
+            </div>
+
+            <div class="form-success" id="form-success">
+                <span class="success-icon">🌟</span>
+                <h3>You're on the Cosmic Map!</h3>
+                <p id="success-msg">Your mark has been etched into the universe.</p>
+                <button type="button" class="reset-btn" onclick="resetForm()">Sign Again ✦</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================================================
+         STATS SECTION
+    ================================================ -->
+    <section class="stats-section">
+        <div class="section-eyebrow">By the Numbers</div>
+        <h2 class="section-heading">The Cosmic Tally</h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span class="stat-icon">🌍</span>
+                <div class="stat-value" id="stat-total">—</div>
+                <div class="stat-label">Total Visitors</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon">🗺️</span>
+                <div class="stat-value" id="stat-countries">—</div>
+                <div class="stat-label">Countries</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon">🏙️</span>
+                <div class="stat-value" id="stat-cities">—</div>
+                <div class="stat-label">Cities</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon">🏆</span>
+                <div class="stat-value sm" id="stat-top-country">—</div>
+                <div class="stat-label">Most Visitors From</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon">📅</span>
+                <div class="stat-value" id="stat-today">—</div>
+                <div class="stat-label">Today's Visitors</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon">💬</span>
+                <div class="stat-value" id="stat-msgs">—</div>
+                <div class="stat-label">Messages Left</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon">🗓️</span>
+                <div class="stat-value" id="stat-week">—</div>
+                <div class="stat-label">This Week</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon">🏙</span>
+                <div class="stat-value sm" id="stat-top-city">—</div>
+                <div class="stat-label">Most Visited City</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================================================
+         QUICK QUERIES
+    ================================================ -->
+    <section class="queries-section">
+        <div class="section-eyebrow">Explore the Data</div>
+        <h2 class="section-heading">Quick Queries</h2>
+        <div class="query-pills" id="query-pills">
+            <button type="button" class="query-pill active" data-query="all">All Visitors</button>
+            <button type="button" class="query-pill" data-query="today">Today's Arrivals</button>
+            <button type="button" class="query-pill" data-query="week">This Week</button>
+            <button type="button" class="query-pill" data-query="month">This Month</button>
+            <button type="button" class="query-pill" data-query="messages">Left a Message</button>
+            <button type="button" class="query-pill" data-query="top-country">Top Country</button>
+            <button type="button" class="query-pill" data-query="newest">Newest First</button>
+            <button type="button" class="query-pill" data-query="oldest">Oldest First</button>
+            <button type="button" class="query-pill" data-query="az-city">A→Z City</button>
+            <button type="button" class="query-pill" data-query="az-country">A→Z Country</button>
+        </div>
+    </section>
+
+    <!-- ================================================
+         GUESTBOOK TABLE
+    ================================================ -->
+    <section class="table-section" id="guestbook">
+        <div class="section-eyebrow">The Guest Book</div>
+
+        <!-- Controls -->
+        <div class="table-controls">
+            <div class="search-wrap">
+                <span class="search-icon">🔍</span>
+                <input type="text" class="search-input" id="search-inp"
+                       placeholder="Search city, country or message…" oninput="onSearch()">
+            </div>
+            <select class="filter-select" id="country-filter" onchange="onCountryFilter()">
+                <option value="">All Countries</option>
+            </select>
+            <button type="button" class="ctrl-btn" id="sort-date" onclick="toggleSort('created_at')">Date ↕</button>
+            <button type="button" class="ctrl-btn" id="sort-country" onclick="toggleSort('country')">Country ↕</button>
+            <button type="button" class="ctrl-btn" id="sort-city" onclick="toggleSort('city')">City ↕</button>
+        </div>
+
+        <!-- Meta -->
+        <div class="table-meta">
+            <div class="table-count" id="table-count">Loading the cosmos…</div>
+            <div class="table-count" id="page-meta"></div>
+        </div>
+
+        <!-- Table -->
+        <div class="table-wrapper">
+            <div class="table-scroll">
+                <table class="data-table">
+                    <caption class="sr-only">Visitor guest book entries with sortable columns.</caption>
+                    <thead>
+                        <tr>
+                            <th scope="col" aria-sort="none"><button type="button" class="th-sort-btn" data-sort="id" onclick="toggleSort('id')"># <span class="si">↕</span></button></th>
+                            <th scope="col" aria-sort="none"><button type="button" class="th-sort-btn" data-sort="city" onclick="toggleSort('city')">City <span class="si">↕</span></button></th>
+                            <th scope="col" aria-sort="none"><button type="button" class="th-sort-btn" data-sort="country" onclick="toggleSort('country')">Country <span class="si">↕</span></button></th>
+                            <th scope="col" aria-sort="none"><button type="button" class="th-sort-btn" data-sort="message" onclick="toggleSort('message')">Message <span class="si">↕</span></button></th>
+                            <th scope="col" aria-sort="none"><button type="button" class="th-sort-btn" data-sort="created_at" onclick="toggleSort('created_at')">Timestamp <span class="si">↕</span></button></th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body">
+                        <tr class="loading-row"><td colspan="5"><div class="loader"></div></td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination" id="pagination"></div>
+        </div>
+    </section>
+
+</div><!-- /container -->
+
+</main>
+
+<!-- ================================================
+     FOOTER
+================================================ -->
+
+<footer>
+    <div class="container">
+        <div class="footer-stars">✦ · · · ✦ · · · ✦ · · · ✦ · · · ✦</div>
+        <p class="footer-text">
+            A hidden corner of <a href="https://hubiedubois.com" target="_blank" rel="noopener noreferrer">hubiedubois.com</a>
+            &nbsp;·&nbsp; Built for wanderers of the web &nbsp;·&nbsp;
+            You are visitor&nbsp;<span class="footer-visitor-num" id="footer-num">—</span><br>
+            No algorithm. No marketing. Just serendipity.
+        </p>
+    </div>
+</footer>
+
+<!-- ============================================================
+     SUPABASE SDK
+============================================================ -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
+<script>
+const SUPABASE_URL  = 'https://sosjuvjjmposjxomgazk.supabase.co';
+const SUPABASE_KEY  = 'sb_publishable_ovo_vZAHmgeTq_cpZ6gjUQ_YkTjlnSG';
+const TURNSTILE_SITE_KEY = '0x4AAAAAAClV8QVA1tdu0OMM';
+
+const PAGE_SIZE = 25;
+const MAX_FETCH_ROWS = 50000;
+
+// ---- Supabase client ----
+let _sb = null;
+const sb = () => _sb || (_sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY));
+
+// ---- State ----
+let allRows      = [];
+let filteredRows = [];
+let currentPage  = 1;
+let sortField    = 'created_at';
+let sortAsc      = false;
+let searchTerm   = '';
+let countryFilter = '';
+let activeQuery  = 'all';
+let captchaToken = '';
+let turnstileWidgetId = null;
+
+function normalizeRow(row) {
+    const createdAtMs = row.created_at ? Date.parse(row.created_at) : NaN;
+    return {
+        ...row,
+        _createdAtMs: Number.isFinite(createdAtMs) ? createdAtMs : null,
+        _cityLc: (row.city || '').toLowerCase(),
+        _countryLc: (row.country || '').toLowerCase(),
+        _messageLc: (row.message || '').toLowerCase(),
+        _hasMsg: Boolean(row.message && row.message.trim())
+    };
+}
+
+// ============================================================
+// STARFIELD CANVAS
+// ============================================================
+(function () {
+    const canvas = document.getElementById('starfield');
+    const ctx    = canvas.getContext('2d');
+    let W, H, stars = [], lastShoot = 0;
+
+    function resize() {
+        W = canvas.width  = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+    }
+
+    function initStars() {
+        stars = [];
+        const n = Math.floor((W * H) / 2800);
+        for (let i = 0; i < n; i++) {
+            stars.push({
+                x:     Math.random() * W,
+                y:     Math.random() * H,
+                r:     Math.random() * 1.5 + 0.15,
+                base:  Math.random() * 0.65 + 0.1,
+                speed: Math.random() * 0.0004 + 0.0001,
+                phase: Math.random() * Math.PI * 2,
+                color: Math.random() > 0.96 ? '#d4af37' :
+                       Math.random() > 0.93 ? '#90a8ff' : '#ffffff'
+            });
+        }
+    }
+
+    function shootingStar(t) {
+        if (t - lastShoot < 5000 + Math.random() * 8000) return;
+        lastShoot = t + Math.random() * 6000;
+        const sx = Math.random() * W * 0.6,
+              sy = Math.random() * H * 0.35,
+              len = 110 + Math.random() * 90,
+              ang = Math.PI / 6 + (Math.random() - 0.5) * 0.4;
+        let prog = 0;
+        (function draw() {
+            prog += 0.045;
+            if (prog >= 1) return;
+            ctx.save();
+            ctx.translate(sx + Math.cos(ang) * len * prog, sy + Math.sin(ang) * len * prog);
+            ctx.rotate(ang);
+            const g = ctx.createLinearGradient(-len * 0.65, 0, 0, 0);
+            g.addColorStop(0, 'transparent');
+            g.addColorStop(1, `rgba(255,248,210,${0.85 * (1 - prog)})`);
+            ctx.strokeStyle = g;
+            ctx.lineWidth = 1.4;
+            ctx.beginPath();
+            ctx.moveTo(-len * 0.65, 0);
+            ctx.lineTo(0, 0);
+            ctx.stroke();
+            ctx.restore();
+            requestAnimationFrame(draw);
+        })();
+    }
+
+    function loop(t) {
+        ctx.clearRect(0, 0, W, H);
+        for (const s of stars) {
+            const tw = Math.sin(t * s.speed * 1000 + s.phase) * 0.28 + 0.72;
+            ctx.globalAlpha = s.base * tw;
+            ctx.fillStyle   = s.color;
+            ctx.beginPath();
+            ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+        shootingStar(t);
+        requestAnimationFrame(loop);
+    }
+
+    resize(); initStars();
+    window.addEventListener('resize', () => { resize(); initStars(); });
+    requestAnimationFrame(loop);
+})();
+
+// ============================================================
+// UTC CLOCK
+// ============================================================
+function tickClock() {
+    const n = new Date();
+    const pad = v => String(v).padStart(2,'0');
+    const el = document.getElementById('utc-clock');
+    if (el) el.textContent = `${pad(n.getUTCHours())}:${pad(n.getUTCMinutes())}:${pad(n.getUTCSeconds())}`;
+}
+setInterval(tickClock, 1000); tickClock();
+
+// ============================================================
+// FLAG MAP
+// ============================================================
+const FLAGS = {
+    'Afghanistan':'🇦🇫','Albania':'🇦🇱','Algeria':'🇩🇿','Argentina':'🇦🇷','Australia':'🇦🇺',
+    'Austria':'🇦🇹','Bangladesh':'🇧🇩','Belgium':'🇧🇪','Bolivia':'🇧🇴','Brazil':'🇧🇷',
+    'Cambodia':'🇰🇭','Canada':'🇨🇦','Chile':'🇨🇱','China':'🇨🇳','Colombia':'🇨🇴',
+    'Croatia':'🇭🇷','Cuba':'🇨🇺','Czech Republic':'🇨🇿','Denmark':'🇩🇰','Ecuador':'🇪🇨',
+    'Egypt':'🇪🇬','Ethiopia':'🇪🇹','Finland':'🇫🇮','France':'🇫🇷','Germany':'🇩🇪',
+    'Ghana':'🇬🇭','Greece':'🇬🇷','Guatemala':'🇬🇹','Haiti':'🇭🇹','Honduras':'🇭🇳',
+    'Hungary':'🇭🇺','India':'🇮🇳','Indonesia':'🇮🇩','Iran':'🇮🇷','Iraq':'🇮🇶',
+    'Ireland':'🇮🇪','Israel':'🇮🇱','Italy':'🇮🇹','Jamaica':'🇯🇲','Japan':'🇯🇵',
+    'Jordan':'🇯🇴','Kenya':'🇰🇪','Kuwait':'🇰🇼','Lebanon':'🇱🇧','Libya':'🇱🇾',
+    'Malaysia':'🇲🇾','Mexico':'🇲🇽','Morocco':'🇲🇦','Myanmar':'🇲🇲','Nepal':'🇳🇵',
+    'Netherlands':'🇳🇱','New Zealand':'🇳🇿','Nicaragua':'🇳🇮','Nigeria':'🇳🇬',
+    'North Korea':'🇰🇵','Norway':'🇳🇴','Pakistan':'🇵🇰','Panama':'🇵🇦','Paraguay':'🇵🇾',
+    'Peru':'🇵🇪','Philippines':'🇵🇭','Poland':'🇵🇱','Portugal':'🇵🇹','Romania':'🇷🇴',
+    'Russia':'🇷🇺','Saudi Arabia':'🇸🇦','Senegal':'🇸🇳','Serbia':'🇷🇸','Singapore':'🇸🇬',
+    'Somalia':'🇸🇴','South Africa':'🇿🇦','South Korea':'🇰🇷','Spain':'🇪🇸','Sri Lanka':'🇱🇰',
+    'Sudan':'🇸🇩','Sweden':'🇸🇪','Switzerland':'🇨🇭','Syria':'🇸🇾','Taiwan':'🇹🇼',
+    'Tanzania':'🇹🇿','Thailand':'🇹🇭','Tunisia':'🇹🇳','Turkey':'🇹🇷','Uganda':'🇺🇬',
+    'Ukraine':'🇺🇦','United Arab Emirates':'🇦🇪','United Kingdom':'🇬🇧',
+    'United States':'🇺🇸','Uruguay':'🇺🇾','Venezuela':'🇻🇪','Vietnam':'🇻🇳',
+    'Yemen':'🇾🇪','Zambia':'🇿🇲','Zimbabwe':'🇿🇼'
+};
+
+function flag(country) { return FLAGS[country] || '🌐'; }
+
+// ============================================================
+// FORMAT DATE
+// ============================================================
+function fmtDate(ts) {
+    if (!ts) return '—';
+    const d = new Date(ts);
+    return d.toLocaleString('en-US', {
+        month:'short', day:'numeric', year:'numeric',
+        hour:'2-digit', minute:'2-digit', timeZoneName:'short'
+    });
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+function toast(msg, type = '') {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.className = `toast ${type} show`;
+    setTimeout(() => el.classList.remove('show'), 3800);
+}
+
+// ============================================================
+// CHAR COUNT
+// ============================================================
+function updateCharCount() {
+    const v = document.getElementById('inp-msg').value.length;
+    document.getElementById('char-count').textContent = v;
+}
+
+function renderTurnstile() {
+    if (!window.turnstile || TURNSTILE_SITE_KEY === 'REPLACE_WITH_TURNSTILE_SITE_KEY') return;
+    const mount = document.getElementById('turnstile-widget');
+    if (!mount || turnstileWidgetId !== null) return;
+
+    turnstileWidgetId = window.turnstile.render('#turnstile-widget', {
+        sitekey: TURNSTILE_SITE_KEY,
+        callback: token => { captchaToken = token; },
+        'expired-callback': () => { captchaToken = ''; },
+        'error-callback': () => { captchaToken = ''; }
+    });
+}
+
+// ============================================================
+// FORM SUBMIT
+// ============================================================
+async function submitVisitor() {
+    const city    = document.getElementById('inp-city').value.trim();
+    const country = document.getElementById('inp-country').value.trim();
+    const message = document.getElementById('inp-msg').value.trim();
+    const errEl   = document.getElementById('form-error');
+    errEl.classList.remove('show');
+
+    if (!city)    { showErr('Please enter your city — even a tiny village counts! 🌿'); return; }
+    if (!country) { showErr('Please enter your country so we know where you\'re from! 🌍'); return; }
+    if (!captchaToken) { showErr('Please complete the anti-spam check before submitting.'); return; }
+
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = true;
+    btn.textContent = '✦   Sending you to the cosmos…';
+
+    try {
+        const { error } = await sb().functions.invoke('submit-visitor', {
+            body: {
+                city,
+                country,
+                message: message || null,
+                turnstileToken: captchaToken
+            }
+        });
+
+        if (error) throw error;
+
+        document.getElementById('form-body').style.display = 'none';
+        document.getElementById('form-success').classList.add('show');
+        document.getElementById('success-msg').textContent =
+            `${city}, ${country} — you're now a permanent dot on the cosmic map. ✦`;
+        toast('🌟 Your mark is in the cosmos!', 'success');
+        await fetchAllData();
+
+    } catch (err) {
+        showErr('Houston, we have a problem: ' + (err.message || 'Unknown error. Check Supabase config.'));
+    } finally {
+        captchaToken = '';
+        if (window.turnstile && turnstileWidgetId !== null) {
+            window.turnstile.reset(turnstileWidgetId);
+        }
+        btn.disabled = false;
+        btn.innerHTML = '✦ &nbsp; Mark My Spot in the Universe';
+    }
+}
+
+function showErr(msg) {
+    const el = document.getElementById('form-error');
+    el.textContent = msg;
+    el.classList.add('show');
+}
+
+function resetForm() {
+    ['inp-city','inp-msg'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('inp-country').value = '';
+    document.getElementById('char-count').textContent = '0';
+    captchaToken = '';
+    if (window.turnstile && turnstileWidgetId !== null) {
+        window.turnstile.reset(turnstileWidgetId);
+    }
+    document.getElementById('form-body').style.display = '';
+    document.getElementById('form-success').classList.remove('show');
+    document.getElementById('form-error').classList.remove('show');
+}
+
+// ============================================================
+// FETCH ALL DATA
+// ============================================================
+async function fetchAllData() {
+    try {
+        const { data, error } = await sb()
+            .from('visitors')
+            .select('id,city,country,message,created_at')
+            .order('created_at', { ascending: false })
+            .limit(MAX_FETCH_ROWS);
+
+        if (error) throw error;
+
+        allRows = (data || []).map(normalizeRow);
+        calcStats();
+        buildCountryFilter();
+        applyFilters();
+
+    } catch (err) {
+        console.error(err);
+        document.getElementById('table-body').innerHTML = `
+            <tr><td colspan="5" style="text-align:center;padding:50px;color:var(--silver-dim);font-style:italic;">
+                ✦ Could not connect to the database.<br>
+                Check your Supabase URL and key, then refresh.
+            </td></tr>`;
+        document.getElementById('table-count').textContent = 'Connection error';
+    }
+}
+
+// ============================================================
+// STATS
+// ============================================================
+function calcStats() {
+    const n = allRows.length;
+    const countries = [...new Set(allRows.map(r => r.country).filter(Boolean))];
+    const cities    = [...new Set(allRows.map(r => r.city).filter(Boolean))];
+    const withMsg   = allRows.filter(r => r._hasMsg).length;
+
+    const now   = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const week  = new Date(today); week.setDate(week.getDate() - 7);
+    const todayMs = today.getTime();
+    const weekMs  = week.getTime();
+
+    const todayN = allRows.filter(r => r._createdAtMs !== null && r._createdAtMs >= todayMs).length;
+    const weekN  = allRows.filter(r => r._createdAtMs !== null && r._createdAtMs >= weekMs).length;
+
+    const cCount = {};
+    allRows.forEach(r => { if (r.country) cCount[r.country] = (cCount[r.country]||0)+1; });
+    const topC = Object.entries(cCount).sort((a,b) => b[1]-a[1])[0];
+
+    const cityCount = {};
+    allRows.forEach(r => { if (r.city) cityCount[r.city] = (cityCount[r.city]||0)+1; });
+    const topCity = Object.entries(cityCount).sort((a,b) => b[1]-a[1])[0];
+
+    set('stat-total',     n.toLocaleString());
+    set('stat-countries', countries.length);
+    set('stat-cities',    cities.length.toLocaleString());
+    set('stat-today',     todayN);
+    set('stat-msgs',      withMsg);
+    set('stat-week',      weekN);
+    set('stat-top-country', topC  ? `${flag(topC[0])} ${topC[0]}`   : '—');
+    set('stat-top-city',    topCity ? topCity[0] : '—');
+    set('footer-num',     n.toLocaleString());
+}
+
+function set(id, val) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = val;
+}
+
+// ============================================================
+// COUNTRY FILTER DROPDOWN
+// ============================================================
+function buildCountryFilter() {
+    const sel      = document.getElementById('country-filter');
+    const current  = sel.value;
+    const countries = [...new Set(allRows.map(r => r.country).filter(Boolean))].sort();
+    sel.innerHTML  = '<option value="">All Countries</option>';
+    countries.forEach(c => {
+        const o = document.createElement('option');
+        o.value = c;
+        o.textContent = `${flag(c)} ${c}`;
+        sel.appendChild(o);
+    });
+    sel.value = current;
+}
+
+// ============================================================
+// QUERY PILLS
+// ============================================================
+document.getElementById('query-pills').addEventListener('click', e => {
+    const btn = e.target.closest('.query-pill');
+    if (!btn) return;
+    document.querySelectorAll('.query-pill').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    activeQuery = btn.dataset.query;
+
+    // reset UI filters
+    searchTerm = ''; countryFilter = '';
+    document.getElementById('search-inp').value = '';
+    document.getElementById('country-filter').value = '';
+
+    switch (activeQuery) {
+        case 'newest':     sortField = 'created_at'; sortAsc = false; break;
+        case 'oldest':     sortField = 'created_at'; sortAsc = true;  break;
+        case 'az-city':    sortField = 'city';        sortAsc = true;  break;
+        case 'az-country': sortField = 'country';     sortAsc = true;  break;
+        case 'top-country':
+            const cc = {};
+            allRows.forEach(r => { if (r.country) cc[r.country] = (cc[r.country]||0)+1; });
+            const top = Object.entries(cc).sort((a,b) => b[1]-a[1])[0];
+            if (top) {
+                countryFilter = top[0];
+                document.getElementById('country-filter').value = top[0];
+            }
+            sortField = 'created_at'; sortAsc = false; break;
+        default:
+            sortField = 'created_at'; sortAsc = false;
+    }
+    currentPage = 1;
+    applyFilters();
+});
+
+// ============================================================
+// APPLY FILTERS + SORT
+// ============================================================
+function applyFilters() {
+    let data = [...allRows];
+
+    // Query-level date filters
+    const now   = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const week  = new Date(today); week.setDate(week.getDate() - 7);
+    const month = new Date(today); month.setMonth(month.getMonth() - 1);
+    const todayMs = today.getTime();
+    const weekMs  = week.getTime();
+    const monthMs = month.getTime();
+
+    if (activeQuery === 'today')    data = data.filter(r => r._createdAtMs !== null && r._createdAtMs >= todayMs);
+    if (activeQuery === 'week')     data = data.filter(r => r._createdAtMs !== null && r._createdAtMs >= weekMs);
+    if (activeQuery === 'month')    data = data.filter(r => r._createdAtMs !== null && r._createdAtMs >= monthMs);
+    if (activeQuery === 'messages') data = data.filter(r => r._hasMsg);
+
+    // Country filter
+    if (countryFilter) data = data.filter(r => r.country === countryFilter);
+
+    // Search
+    if (searchTerm) {
+        const s = searchTerm.toLowerCase();
+        data = data.filter(r =>
+            r._cityLc.includes(s)    ||
+            r._countryLc.includes(s) ||
+            r._messageLc.includes(s)
+        );
+    }
+
+    // Sort
+    data.sort((a, b) => {
+        let va = a[sortField] ?? '';
+        let vb = b[sortField] ?? '';
+        if (sortField === 'created_at') {
+            va = a._createdAtMs ?? -Infinity;
+            vb = b._createdAtMs ?? -Infinity;
+        }
+        const cmp = typeof va === 'string' ? va.localeCompare(vb) : va - vb;
+        return sortAsc ? cmp : -cmp;
+    });
+
+    filteredRows = data;
+
+    // Count display
+    const el = document.getElementById('table-count');
+    const total  = allRows.length;
+    const shown  = filteredRows.length;
+    el.innerHTML = shown === total
+        ? `<span>${total.toLocaleString()}</span> wanderers in the book`
+        : `<span>${shown.toLocaleString()}</span> of ${total.toLocaleString()} visitors`;
+
+    updateSortControls();
+    updateSortIndicators();
+    renderPage(1);
+}
+
+// ============================================================
+// RENDER PAGE
+// ============================================================
+function renderPage(page) {
+    currentPage = page;
+    const total = Math.ceil(filteredRows.length / PAGE_SIZE);
+    const start = (page - 1) * PAGE_SIZE;
+    const rows  = filteredRows.slice(start, start + PAGE_SIZE);
+    const tbody = document.getElementById('table-body');
+
+    if (!filteredRows.length) {
+        tbody.innerHTML = `<tr><td colspan="5">
+            <div class="empty-state">
+                <span class="empty-icon">🌌</span>
+                <p>The cosmos is quiet… no visitors match your search.</p>
+            </div>
+        </td></tr>`;
+        document.getElementById('pagination').innerHTML = '';
+        document.getElementById('page-meta').textContent = '';
+        return;
+    }
+
+    tbody.innerHTML = rows.map((r, i) => {
+        const msg = r.message?.trim() || '';
+        return `<tr>
+            <td class="tc-num">${start + i + 1}</td>
+            <td class="tc-city">${esc(r.city || '—')}</td>
+            <td class="tc-country"><span class="flag">${flag(r.country)}</span>${esc(r.country || '—')}</td>
+            <td class="tc-msg ${msg ? '' : 'empty'}" title="${esc(msg)}">${msg ? esc(msg) : '—'}</td>
+            <td class="tc-time">${fmtDate(r.created_at)}</td>
+        </tr>`;
+    }).join('');
+
+    document.getElementById('page-meta').textContent =
+        total > 1 ? `Page ${page} of ${total}` : '';
+
+    renderPagination(page, total);
+}
+
+// ============================================================
+// PAGINATION
+// ============================================================
+function renderPagination(cur, total) {
+    const el = document.getElementById('pagination');
+    if (total <= 1) { el.innerHTML = ''; return; }
+
+    const pages = [];
+    if (total <= 7) {
+        for (let i = 1; i <= total; i++) pages.push(i);
+    } else {
+        pages.push(1);
+        if (cur > 3) pages.push('…');
+        for (let i = Math.max(2, cur-1); i <= Math.min(total-1, cur+1); i++) pages.push(i);
+        if (cur < total-2) pages.push('…');
+        pages.push(total);
+    }
+
+    el.innerHTML = `
+        <button type="button" class="page-btn" onclick="renderPage(${cur-1})" ${cur===1?'disabled':''}>← Prev</button>
+        ${pages.map(p => p === '…'
+            ? `<span class="page-ellipsis">···</span>`
+            : `<button type="button" class="page-btn ${p===cur?'active':''}" onclick="renderPage(${p})">${p}</button>`
+        ).join('')}
+        <button type="button" class="page-btn" onclick="renderPage(${cur+1})" ${cur===total?'disabled':''}>Next →</button>
+    `;
+}
+
+// ============================================================
+// SORT
+// ============================================================
+function toggleSort(field) {
+    sortAsc = sortField === field ? !sortAsc : true;
+    sortField = field;
+    currentPage = 1;
+    applyFilters();
+}
+
+function updateSortControls() {
+    ['sort-date','sort-country','sort-city'].forEach(id => {
+        document.getElementById(id)?.classList.remove('active');
+    });
+    const map = { created_at:'sort-date', country:'sort-country', city:'sort-city' };
+    if (map[sortField]) document.getElementById(map[sortField])?.classList.add('active');
+}
+
+function updateSortIndicators() {
+    document.querySelectorAll('.th-sort-btn').forEach(btn => {
+        const isActive = btn.dataset.sort === sortField;
+        btn.classList.toggle('active', isActive);
+        const th = btn.closest('th');
+        if (th) th.setAttribute('aria-sort', isActive ? (sortAsc ? 'ascending' : 'descending') : 'none');
+    });
+}
+
+// ============================================================
+// SEARCH & FILTER
+// ============================================================
+let searchTimer;
+function onSearch() {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => {
+        searchTerm  = document.getElementById('search-inp').value.trim();
+        currentPage = 1;
+        applyFilters();
+    }, 280);
+}
+
+function onCountryFilter() {
+    countryFilter = document.getElementById('country-filter').value;
+    currentPage   = 1;
+    applyFilters();
+}
+
+// ============================================================
+// XSS ESCAPE
+// ============================================================
+function esc(s) {
+    return String(s)
+        .replace(/&/g,'&amp;')
+        .replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;');
+}
+
+// ============================================================
+// REAL-TIME SUBSCRIPTION
+// ============================================================
+function setupRealtime() {
+    try {
+        sb().channel('visitors-live')
+            .on('postgres_changes',
+                { event: 'INSERT', schema: 'public', table: 'visitors' },
+                async payload => {
+                    const { city, country } = payload.new;
+                    toast(`✦ New visitor: ${city}, ${country}!`);
+                    await fetchAllData();
+                })
+            .subscribe();
+    } catch (e) { /* realtime is a bonus, not critical */ }
+}
+
+// ============================================================
+// INIT
+// ============================================================
+fetchAllData().then(setupRealtime);
+updateSortControls();
+updateSortIndicators();
+const tsTimer = setInterval(() => {
+    if (turnstileWidgetId !== null || TURNSTILE_SITE_KEY === 'REPLACE_WITH_TURNSTILE_SITE_KEY') {
+        clearInterval(tsTimer);
+        return;
+    }
+    renderTurnstile();
+}, 250);
+</script>
+
+</body>
+</html>
