@@ -26,3 +26,6 @@ pnpm-debug.log*
 # Local-only project notes/migrations
 HARDENING_STEPS.md
 supabase_harden_visitors.sql
+MONITORING.md
+scripts/
+supabase/functions/
