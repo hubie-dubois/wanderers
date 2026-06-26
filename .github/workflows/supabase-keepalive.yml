@@ -1,0 +1,57 @@
+name: Supabase Keepalive
+
+on:
+  workflow_dispatch:
+  schedule:
+    # GitHub cron is UTC. These run around morning/evening in Chicago.
+    - cron: "23 9 * * *"
+    - cron: "47 21 * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: supabase-keepalive
+  cancel-in-progress: true
+
+jobs:
+  ping:
+    name: Query Supabase visitors
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Run keepalive query
+        shell: bash
+        env:
+          SUPABASE_URL: "https://sosjuvjjmposjxomgazk.supabase.co"
+          SUPABASE_PUBLISHABLE_KEY: "sb_publishable_myrITCQJvJAnUGVx6ZMofA_911DojLi"
+        run: |
+          set -u
+
+          endpoint="${SUPABASE_URL}/rest/v1/visitors?select=id&limit=1"
+          response_file="${RUNNER_TEMP}/supabase-keepalive-response.json"
+
+          for attempt in 1 2 3; do
+            status_code="$(curl --silent --show-error --output "${response_file}" --write-out "%{http_code}" --max-time 20 \
+              "${endpoint}" \
+              -H "apikey: ${SUPABASE_PUBLISHABLE_KEY}" \
+              -H "Authorization: Bearer ${SUPABASE_PUBLISHABLE_KEY}" \
+              -H "Accept: application/json")"
+
+            if [[ "${status_code}" == 2* ]]; then
+              echo "Supabase keepalive succeeded with HTTP ${status_code}."
+              exit 0
+            fi
+
+            echo "Supabase keepalive attempt ${attempt} failed with HTTP ${status_code}."
+            if [[ -s "${response_file}" ]]; then
+              tr -d '\000-\011\013-\037' < "${response_file}"
+              echo
+            fi
+
+            sleep "$((attempt * 10))"
+          done
+
+          echo "::error::Supabase keepalive failed after 3 attempts."
+          exit 1
