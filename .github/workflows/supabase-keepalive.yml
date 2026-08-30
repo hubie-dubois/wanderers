@@ -3,12 +3,12 @@ name: Supabase Keepalive
 on:
   workflow_dispatch:
   schedule:
-    # GitHub cron is UTC. These run around morning/evening in Chicago.
-    - cron: "23 9 * * *"
-    - cron: "47 21 * * *"
+    # GitHub cron is UTC. Keep this off minute 0, and create several real DB
+    # reads per day so Supabase Free does not classify the project as inactive.
+    - cron: "23 */6 * * *"
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: supabase-keepalive
@@ -21,15 +21,18 @@ jobs:
     timeout-minutes: 5
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Run keepalive query
         shell: bash
         env:
           SUPABASE_URL: "https://sosjuvjjmposjxomgazk.supabase.co"
           SUPABASE_PUBLISHABLE_KEY: "sb_publishable_myrITCQJvJAnUGVx6ZMofA_911DojLi"
         run: |
-          set -u
+          set -euo pipefail
 
-          endpoint="${SUPABASE_URL}/rest/v1/visitors?select=id&limit=1"
+          endpoint="${SUPABASE_URL}/rest/v1/visitors?select=id&order=created_at.desc&limit=1"
           response_file="${RUNNER_TEMP}/supabase-keepalive-response.json"
 
           for attempt in 1 2 3; do
@@ -45,6 +48,10 @@ jobs:
             fi
 
             echo "Supabase keepalive attempt ${attempt} failed with HTTP ${status_code}."
+            if [[ "${status_code}" == "540" ]]; then
+              echo "::error::Supabase reports the project is paused. Resume it once, then rerun this workflow."
+            fi
+
             if [[ -s "${response_file}" ]]; then
               tr -d '\000-\011\013-\037' < "${response_file}"
               echo
@@ -55,3 +62,25 @@ jobs:
 
           echo "::error::Supabase keepalive failed after 3 attempts."
           exit 1
+
+      - name: Keep scheduled workflows active
+        if: success() && github.ref == 'refs/heads/main'
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          stamp_file=".github/keepalive-stamp"
+          stamp="$(date -u +'%Y-%m')"
+
+          if [[ -f "${stamp_file}" ]] && [[ "$(cat "${stamp_file}")" == "${stamp}" ]]; then
+            echo "Repository activity already recorded for ${stamp}."
+            exit 0
+          fi
+
+          printf '%s\n' "${stamp}" > "${stamp_file}"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "${stamp_file}"
+          git commit -m "Keep scheduled workflows active"
+          git push
